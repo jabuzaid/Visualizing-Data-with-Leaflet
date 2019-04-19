@@ -8,8 +8,6 @@
 // Store our API endpoint inside queryUrl
 var queryUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson"
 
-var query2 = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojson"
-
 // Perform a GET request to the query URL
 d3.json(queryUrl, function(data) {
   // Once we get a response, send the data.features object to the createFeatures function
@@ -17,7 +15,6 @@ d3.json(queryUrl, function(data) {
 });
 
 function createFeatures(earthquakeData) {
-
 
   // Give each feature a popup describing the place and time of the earthquake
   function onEachFeature(feature, layer) {
@@ -52,11 +49,11 @@ function createFeatures(earthquakeData) {
 
   // Sending our earthquakes layer to the createMap function
   createMap(earthquakes);
-  
 }
 
 function createMap(earthquakes) {
-    // Define streetmap layer
+
+  // Define streetmap layer
   var streetsmap = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
     attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
     maxZoom: 18,
@@ -73,30 +70,30 @@ function createMap(earthquakes) {
   });
   
   // Define satellite layer
-    var satellitemap = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
-      attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
-      maxZoom: 18,
-      id: "mapbox.satellite",
-      accessToken: API_KEY
-    });
+  var satellitemap = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
+    attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
+    maxZoom: 18,
+    id: "mapbox.satellite",
+    accessToken: API_KEY
+  });
   
-    // Define grayscale layer
-    var piratesmap = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
-      attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
-      maxZoom: 18,
-      id: "mapbox.pirates",
-      accessToken: API_KEY
-    });
+  // Define pirates layer
+  var piratesmap = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
+    attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
+    maxZoom: 18,
+    id: "mapbox.pirates",
+    accessToken: API_KEY
+  });
   
-    var outdoorsmap = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
-      attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
-      maxZoom: 18,
-      id: "mapbox.outdoors",
-      accessToken: API_KEY
-    });
+  // Define outdoors layer
+  var outdoorsmap = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
+    attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
+    maxZoom: 18,
+    id: "mapbox.outdoors",
+    accessToken: API_KEY
+  });
 
-  
-  // Define a baseMaps object to hold our base layers
+  // Define a baseMaps object to hold our five base layers
   var baseMaps = {
     Street: streetsmap,
     Grayscale: darkmap,
@@ -104,38 +101,38 @@ function createMap(earthquakes) {
     pirate: piratesmap,
     Outdoors: outdoorsmap
   };
-
+  // Perform a GET request to the new query URL at github for fault lines
+    
   var plates = new L.LayerGroup();
   d3.json("https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_plates.json", data => {
+    
+    // Once we get a response, create new fault lines layer
     L.geoJSON(data, {
       color:"orange",
       weight:2
+    // plates.addTo(myMap);
     }).addTo(plates);
   });
 
-  // plates.addTo(myMap);
-  // Create overlay object to hold our overlay layer
+  // Create overlay object to hold our overlay layers
   var overlayMaps = {
     Earthquakes: earthquakes,
     FaultLines : plates
   };
 
-  // Create our map, giving it the streetmap and earthquakes layers to display on load
+  // Create our map, giving it the streetsmap and earthquakes layers to display on load
   var myMap = L.map("map", {
-    center: [
-      17.09, 9.13
-    ],
+    center: [17.09, 9.13],
     zoom: 2,
     layers: [streetsmap, earthquakes]
   });
 
   // Create a layer control
   // Pass in our baseMaps and overlayMaps
-  // Add the layer control to the map
+  // Add the layer control to the myMap
   L.control.layers(baseMaps, overlayMaps, {
     collapsed: false
   }).addTo(myMap)
-
 
   function getColor(d) {
       return d < 1 ? '#fff5f0' :
@@ -150,11 +147,11 @@ function createMap(earthquakes) {
                      '#000000' ;
   }
   
-  // Create a legend to display information about our map
+  // Create an earthquake magnitude color legend to be displayed on the map
   var legend = L.control({position: 'bottomright'});
 
   legend.onAdd = function (map) {
-  
+      
       var div = L.DomUtil.create('div', 'info legend'),
       grades = [0, 1, 2, 3, 4, 5, 6, 7, 8],
       labels = [];
