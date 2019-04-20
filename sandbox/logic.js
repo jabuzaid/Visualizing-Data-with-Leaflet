@@ -7,6 +7,18 @@
 //
 // Store our API endpoint inside queryUrl
 var queryUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson"
+function getColor(d) {
+    return d < 1 ? '#b8ff56' :
+          d < 2  ? '#fcfaa4' :
+          d < 3  ? '#bab38d' :
+          d < 4  ? '#88ad6b' :
+          d < 5  ? '#f72a2a' :
+          d < 6  ? '#89141c' :
+          d < 7  ? '#5e070d' :
+          d < 8  ? '#4c0207' :
+          d < 9  ? '#63080f' :
+                   '#000000' ;
+};
 
 // Perform a GET request to the query URL
 d3.json(queryUrl, function(data) {
@@ -29,13 +41,13 @@ function createFeatures(earthquakeData) {
     onEachFeature: onEachFeature,
     pointToLayer: function (feature, latlng) {
       var color;
-      var r = 255;
-      var g = Math.floor(255-80*feature.properties.mag);
-      var b = Math.floor(255-80*feature.properties.mag);
-      color= "rgb("+r+" ,"+g+","+ b+")"
+    //  var r = 255;
+    //  var g = Math.floor(255-80*feature.properties.mag);
+     // var b = Math.floor(255-80*feature.properties.mag);
+      color= getColor(feature.properties.mag);
       
       var geojsonMarkerOptions = {
-        radius: 4*feature.properties.mag,
+        radius: 2*feature.properties.mag,
         fillColor: color,
         color: "black",
         weight: 1,
@@ -134,24 +146,12 @@ function createMap(earthquakes) {
     collapsed: false
   }).addTo(myMap)
 
-  function getColor(d) {
-      return d < 1 ? '#fff5f0' :
-            d < 2  ? '#fee0d2' :
-            d < 3  ? '#fcbba1' :
-            d < 4  ? '#fc9272' :
-            d < 5  ? '#fb6a4a' :
-            d < 6  ? '#ef3b2c' :
-            d < 7  ? '#cb181d' :
-            d < 8  ? '#a50f15' :
-            d < 9  ? '#67000d' :
-                     '#000000' ;
-  }
   
   // Create an earthquake magnitude color legend to be displayed on the map
   var legend = L.control({position: 'bottomright'});
 
   legend.onAdd = function (map) {
-      
+
       var div = L.DomUtil.create('div', 'info legend'),
       grades = [0, 1, 2, 3, 4, 5, 6, 7, 8],
       labels = [];
